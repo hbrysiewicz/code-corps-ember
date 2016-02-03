@@ -1,0 +1,9 @@
+<div class="tabs">
+  <button class="edit" {{action 'edit'}}>Edit</button>
+  <button class="preview" {{action 'preview'}}>Preview</button>
+</div>
+{{#if editing}}
+  {{textarea value=input}}
+{{else}}
+  <div class="body">{{{preview}}}</div>
+{{/if}}
