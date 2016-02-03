@@ -18,7 +18,8 @@ export default Ember.Component.extend({
     preview() {
       this.set('mode', 'previewing');
       this.set('preview', 'Loading preview...');
-      this.sendAction('generatePreview');
+      let content = this.get('input');
+      this.sendAction('generatePreview', content);
     },
 
     edit() {

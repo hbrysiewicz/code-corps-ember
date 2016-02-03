@@ -35,12 +35,11 @@ test('user can switch between editing and preview mode', function(assert) {
 
 test('It triggers a "generatePreview" action when preview button is clicked and initiates loading', function(assert) {
   assert.expect(2);
-  this.render(hbs`{{editor-with-preview preview='Random text...' generatePreview='generatePreview'}}`);
+  this.render(hbs`{{editor-with-preview input='test' preview='Random text...' generatePreview='generatePreview'}}`);
 
-  this.on('generatePreview', function() {
-    assert.ok(true, 'The action was triggered');
+  this.on('generatePreview', function(content) {
+    assert.equal(content, 'test', 'The action was triggered with correct content');
   });
-
   this.$('.preview').click();
   assert.equal(this.$('.editor-with-preview.previewing .body').text().trim(), 'Loading preview...', 'The loading indicator renders');
 });
