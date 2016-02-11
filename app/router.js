@@ -16,7 +16,6 @@ Router.map(function() {
     this.route('posts', { path: '/posts' }, function() {
       this.route('new');
       this.route('post', { path: '/:number' });
-      this.route('edit', { path: '/:number/edit'});
     });
   });
 });

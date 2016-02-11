@@ -1,4 +1,16 @@
-<h1 class="title">{{post.title}}</h1>
+{{#if isEditingTitle}}
+  {{!--TODO: Title editing goes here--}}
+{{else}}
+  <h1 class="title">{{post.title}}</h1>
+{{/if}}
+
 <span class="post-type">{{post.postType}}</span>
-<div class="body">{{{post.body}}}</div>
-{{#link-to 'project.posts.edit' post.number class="edit"}}Edit{{/link-to}}
+<button class="edit" {{action 'editPost'}}>Edit</button>
+
+{{#if isEditingBody}}
+  {{editor-with-preview input=post.markdownPreview preview=post.bodyPreview generatePreview='generatePreview'}}
+  <button {{action 'save'}} class="save">Save</button>
+  <button {{action 'cancel'}} class="cancel">Cancel</button>
+{{else}}
+  <div class="body">{{{post.body}}}</div>
+{{/if}}

@@ -461,7 +461,7 @@ test('Creating a post requires logging in', (assert) => {
 });
 
 test('A post can be edited', (assert) => {
-  assert.expect(8);
+  assert.expect(6);
 
   // server.create uses factories. server.schema.<obj>.create does not
   let organization = server.schema.organization.create({ slug: 'test_organization' });
@@ -486,7 +486,6 @@ test('A post can be edited', (assert) => {
   });
 
   andThen(() => {
-    assert.equal(currentRouteName(), 'project.posts.edit');
     fillIn('textarea[name=markdown]', 'Some type of markdown');
 
     let previewDone = assert.async();
@@ -519,8 +518,6 @@ test('A post can be edited', (assert) => {
   });
 
   andThen(() => {
-    let saveDone = assert.async();
-
     server.patch(`/posts/${post.id}`, (db, request) => {
       let params = JSON.parse(request.requestBody);
       let attributes = params.data.attributes;
@@ -530,7 +527,6 @@ test('A post can be edited', (assert) => {
       assert.equal(attributes.markdown_preview, 'Some type of markdown', 'Markdown preview was sent correctly');
       assert.equal(attributes.preview, false, 'Preview flag was correctly not set');
 
-      saveDone();
       return {
         data: {
           id: post.id,
@@ -550,9 +546,4 @@ test('A post can be edited', (assert) => {
 
     click('.save');
   });
-
-  andThen(() => {
-    assert.equal(currentRouteName(), 'project.posts.post');
-  });
-
 });
