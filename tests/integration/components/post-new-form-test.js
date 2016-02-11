@@ -18,7 +18,7 @@ test('it renders proper ui elements, properly bound', function(assert) {
 
   let post = {
     title: 'A post',
-    markdown: 'A body',
+    markdownPreview: 'A body',
     postType: 'task'
   };
 
@@ -29,7 +29,6 @@ test('it renders proper ui elements, properly bound', function(assert) {
   assert.equal(this.$('[name=markdown]').val(), 'A body', 'Markdown content is properly bound and rendered');
   assert.equal(this.$('[name=post-type]').val(), 'task', 'Post type is properly bound and rendered');
 });
-
 
 test('it triggers an action when the post is saved', function(assert) {
   assert.expect(2);

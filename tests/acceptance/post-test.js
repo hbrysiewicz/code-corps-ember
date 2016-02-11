@@ -264,6 +264,58 @@ test('A post can be successfully created', (assert) => {
   });
 });
 
+test('Post preview works during creation', (assert) => {
+  assert.expect(3);
+
+  let user = server.schema.user.create({ username: 'test_user' });
+
+  // server.create uses factories. server.schema.<obj>.create does not
+  let organization = server.schema.organization.create({ slug: 'test_organization' });
+  let sluggedRoute = server.schema.sluggedRoute.create({ slug: 'test_organization', modelType: 'organization' });
+  let projectId = server.create('project', { slug: 'test_project' }).id;
+
+  // need to assign polymorphic properties explicitly
+  // TODO: see if it's possible to override models so we can do this in server.create
+  sluggedRoute.model = organization;
+  sluggedRoute.save();
+
+  let project = server.schema.project.find(projectId);
+  project.organization = organization;
+  project.save();
+
+  authenticateSession(application, { user_id: user.id });
+
+  visit('/test_organization/test_project/posts/new');
+
+  andThen(() => {
+    fillIn('textarea[name=markdown]', 'Some type of markdown');
+
+    click('.preview');
+    server.post(`/posts/`, (db, request) => {
+      let params = JSON.parse(request.requestBody);
+      let attributes = params.data.attributes;
+
+      assert.deepEqual(Object.keys(attributes), ['markdown_preview', 'preview']);
+      assert.equal(attributes.markdown_preview, 'Some type of markdown', 'Markdown preview was sent correctly');
+      assert.equal(attributes.preview, true, 'Preview flag is correctly set to true');
+
+      return {
+        data: {
+          id: 1,
+          type: 'posts',
+          attributes: {
+            markdown_preview: 'Some type of markdown',
+            body_preview: '<p>Some type of markdown</p>'
+          },
+          relationships: {
+            project: { data: { id: project.id, type: 'projects' } }
+          }
+        }
+      };
+    });
+  });
+});
+
 test('When post creation succeeeds, the user is redirected to the post page for the new post', (assert) => {
   assert.expect(2);
 

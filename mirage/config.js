@@ -37,15 +37,30 @@ export default function() {
     let relationships = body.data.relationships;
 
     // server sets post number automatically, so we simulate this behavior here
-    let postCount = schema.project.find(relationships.project.data.id).posts.length;
+    let postNumber = schema.project.find(relationships.project.data.id).posts.length + 1;
+
+    // we only markdown_preview from client. markdown, body and body_preview are all set server side
+    let postMarkdown = attributes.markdown_preview;
+    let postBody = `<p>${postMarkdown}</p>`;
 
     let post = schema.post.create(Ember.merge(attributes, {
       projectId: relationships.project.data.id,
       userId: relationships.user.data.id,
-      number: postCount + 1
+      number: postNumber,
+      bodyPreview: postBody,
+      body: postBody,
+      markdown: postMarkdown,
     }));
 
-    return { data: Ember.merge(body.data, { id: post.id }) };
+    return { data: Ember.merge(body.data, {
+      id: post.id,
+      attributes: {
+        number: postNumber,
+        body_preview: postBody,
+        body: postBody,
+        markdown: postMarkdown,
+      }
+    }) };
   });
 
   this.patch('/posts/:id');
