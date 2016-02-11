@@ -1,16 +1,14 @@
-{{#if isEditingTitle}}
-  {{!--TODO: Title editing goes here--}}
-{{else}}
-  <h1 class="title">{{post.title}}</h1>
-{{/if}}
+{{post-title title=post.title saveTitle='savePostTitle'}}
 
 <span class="post-type">{{post.postType}}</span>
-<button class="edit" {{action 'editPost'}}>Edit</button>
 
-{{#if isEditingBody}}
-  {{editor-with-preview input=post.markdownPreview preview=post.bodyPreview generatePreview='generatePreview'}}
-  <button {{action 'save'}} class="save">Save</button>
-  <button {{action 'cancel'}} class="cancel">Cancel</button>
-{{else}}
-  <div class="body">{{{post.body}}}</div>
-{{/if}}
+<div class="post-body">
+  {{#if isEditingBody}}
+    {{editor-with-preview input=post.markdownPreview preview=post.bodyPreview generatePreview='generatePreview'}}
+    <button {{action 'savePostBody'}} class="save">Save</button>
+    <button {{action 'cancel'}} class="cancel">Cancel</button>
+  {{else}}
+    <div class="body">{{{post.body}}}</div>
+    <button class="edit" {{action 'editPostBody'}}>Edit</button>
+  {{/if}}
+</div>

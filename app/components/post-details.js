@@ -10,7 +10,7 @@ export default Ember.Component.extend({
   },
 
   actions: {
-    editPost() {
+    editPostBody() {
       this.set('isEditingBody', true);
     },
 
@@ -21,9 +21,15 @@ export default Ember.Component.extend({
       post.save();
     },
 
-    save() {
+    savePostBody() {
       let post = this.get('post');
       post.set('preview', false);
+      post.save();
+    },
+
+    savePostTitle(title) {
+      let post = this.get('post');
+      post.set('title', title);
       post.save();
     }
   }

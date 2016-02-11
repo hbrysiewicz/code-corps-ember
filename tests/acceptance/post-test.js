@@ -460,7 +460,7 @@ test('Creating a post requires logging in', (assert) => {
   });
 });
 
-test('A post can be edited', (assert) => {
+test('A post body can be edited on it\'s own', (assert) => {
   assert.expect(6);
 
   // server.create uses factories. server.schema.<obj>.create does not
@@ -482,7 +482,7 @@ test('A post can be edited', (assert) => {
   visit(`/${organization.slug}/${project.slug}/posts/${post.number}`);
 
   andThen(() => {
-    click('.edit');
+    click('.post-body .edit');
   });
 
   andThen(() => {
@@ -545,5 +545,55 @@ test('A post can be edited', (assert) => {
     });
 
     click('.save');
+  });
+});
+
+test('A post title can be edited on it\'s own', (assert) => {
+  assert.expect(2);
+
+  // server.create uses factories. server.schema.<obj>.create does not
+  let organization = server.schema.organization.create({ slug: 'test_organization' });
+  let sluggedRoute = server.schema.sluggedRoute.create({ slug: 'test_organization', modelType: 'organization' });
+  let projectId = server.create('project').id;
+
+  // need to assign polymorphic properties explicitly
+  // TODO: see if it's possible to override models so we can do this in server.create
+  sluggedRoute.model = organization;
+  sluggedRoute.save();
+
+  let project = server.schema.project.find(projectId);
+  project.organization = organization;
+  project.save();
+
+  let post = project.createPost({ title: "Test title", body: "Test body", postType: "issue", number: 1 });
+
+  visit(`/${organization.slug}/${project.slug}/posts/${post.number}`);
+
+  andThen(() => {
+    click('.post-title .edit');
+    fillIn('.post-title input[name=title]', 'Edited title');
+
+    server.patch(`/posts/${post.id}`, (db, request) => {
+      let params = JSON.parse(request.requestBody);
+      let attributes = params.data.attributes;
+
+      assert.deepEqual(Object.keys(attributes), ['title'], 'Only the title attribute is in the payload');
+      assert.equal(attributes.title, 'Edited title', 'New title was sent correctly');
+
+      return {
+        data: {
+          id: post.id,
+          type: 'posts',
+          attributes: {
+            title: attributes.title
+          },
+          relationships: {
+            project: { data: { id: project.id, type: 'projects' } }
+          }
+        }
+      };
+    });
+
+    click('.post-title .save');
   });
 });
