@@ -3,7 +3,7 @@
   <button class="preview" {{action 'preview'}}>Preview</button>
 </div>
 {{#if editing}}
-  {{textarea value=input}}
+  {{textarea name="markdown" value=input}}
 {{else}}
   <div class="body">{{{preview}}}</div>
 {{/if}}

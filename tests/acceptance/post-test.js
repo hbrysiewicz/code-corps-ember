@@ -459,3 +459,100 @@ test('Creating a post requires logging in', (assert) => {
     assert.equal(currentURL(), '/test_organization/test_project/posts/new');
   });
 });
+
+test('A post can be edited', (assert) => {
+  assert.expect(8);
+
+  // server.create uses factories. server.schema.<obj>.create does not
+  let organization = server.schema.organization.create({ slug: 'test_organization' });
+  let sluggedRoute = server.schema.sluggedRoute.create({ slug: 'test_organization', modelType: 'organization' });
+  let projectId = server.create('project').id;
+
+  // need to assign polymorphic properties explicitly
+  // TODO: see if it's possible to override models so we can do this in server.create
+  sluggedRoute.model = organization;
+  sluggedRoute.save();
+
+  let project = server.schema.project.find(projectId);
+  project.organization = organization;
+  project.save();
+
+  let post = project.createPost({ title: "Test title", body: "Test body", postType: "issue", number: 1 });
+
+  visit(`/${organization.slug}/${project.slug}/posts/${post.number}`);
+
+  andThen(() => {
+    click('.edit');
+  });
+
+  andThen(() => {
+    assert.equal(currentRouteName(), 'project.posts.edit');
+    fillIn('textarea[name=markdown]', 'Some type of markdown');
+
+    let previewDone = assert.async();
+
+    click('.preview');
+
+    server.patch(`/posts/${post.id}`, (db, request) => {
+      let params = JSON.parse(request.requestBody);
+      let attributes = params.data.attributes;
+
+      assert.deepEqual(Object.keys(attributes), ['markdown_preview', 'preview']);
+      assert.equal(attributes.markdown_preview, 'Some type of markdown', 'Markdown preview was sent correctly');
+      assert.equal(attributes.preview, true, 'Preview flag is correctly set to true');
+
+      previewDone();
+      return {
+        data: {
+          id: post.id,
+          type: 'posts',
+          attributes: {
+            markdown_preview: 'Some type of markdown',
+            body_preview: '<p>Some type of markdown</p>'
+          },
+          relationships: {
+            project: { data: { id: project.id, type: 'projects' } }
+          }
+        }
+      };
+    });
+  });
+
+  andThen(() => {
+    let saveDone = assert.async();
+
+    server.patch(`/posts/${post.id}`, (db, request) => {
+      let params = JSON.parse(request.requestBody);
+      let attributes = params.data.attributes;
+
+      assert.deepEqual(Object.keys(attributes),
+        ['markdown_preview', 'preview']);
+      assert.equal(attributes.markdown_preview, 'Some type of markdown', 'Markdown preview was sent correctly');
+      assert.equal(attributes.preview, false, 'Preview flag was correctly not set');
+
+      saveDone();
+      return {
+        data: {
+          id: post.id,
+          type: 'posts',
+          attributes: {
+            markdown: 'Some type of markdown',
+            body: '<p>Some type of markdown</p>',
+            markdown_preview: 'Some type of markdown',
+            body_preview: '<p>Some type of markdown</p>'
+          },
+          relationships: {
+            project: { data: { id: project.id, type: 'projects' } }
+          }
+        }
+      };
+    });
+
+    click('.save');
+  });
+
+  andThen(() => {
+    assert.equal(currentRouteName(), 'project.posts.post');
+  });
+
+});
