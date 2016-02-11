@@ -4,5 +4,7 @@
   <button class="cancel" {{action 'cancel'}}>Cancel</button>
 {{else}}
   <h2 class="title">{{title}}</h2>
-  <button class="edit" {{action 'edit'}}>Edit</button>
+  {{#if session.isAuthenticated}}
+    <button class="edit" {{action 'edit'}}>Edit</button>
+  {{/if}}
 {{/if}}

@@ -9,6 +9,8 @@
     <button {{action 'cancel'}} class="cancel">Cancel</button>
   {{else}}
     <div class="body">{{{post.body}}}</div>
-    <button class="edit" {{action 'editPostBody'}}>Edit</button>
+    {{#if session.isAuthenticated}}
+      <button class="edit" {{action 'editPostBody'}}>Edit</button>
+    {{/if}}
   {{/if}}
 </div>

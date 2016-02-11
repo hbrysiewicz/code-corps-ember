@@ -1,8 +1,17 @@
 import { moduleForComponent, test } from 'ember-qunit';
 import hbs from 'htmlbars-inline-precompile';
+import Ember from 'ember';
+
+let mockSession = Ember.Service.extend({
+  isAuthenticated: true
+});
 
 moduleForComponent('post-title', 'Integration | Component | post title', {
-  integration: true
+  integration: true,
+  beforeEach() {
+    this.container.register('service:session', mockSession);
+    this.container.injection('component', 'sessionService', 'service:session');
+  }
 });
 
 test('it renders', function(assert) {
