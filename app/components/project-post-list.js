@@ -33,13 +33,9 @@ export default Ember.Component.extend({
     return this._normalizeMeta(this.get('meta'));
   }),
 
-  pageParams: Ember.computed('pageNumber', function() {
-    return { number: this.get('pageNumber') };
-  }),
-
-  filters: Ember.computed('pageParams', 'postType', function() {
+  filters: Ember.computed('pageNumber', 'postType', function() {
     let filters = {};
-    filters.page = this.get('pageParams');
+    filters.pageNumber = this.get('pageNumber');
 
     let postType = this.get('postType');
     if (Ember.isPresent(postType)) {
@@ -50,6 +46,9 @@ export default Ember.Component.extend({
   }),
 
   actions: {
+    removeFilter() {
+      this.setProperties({ postType: null, pageNumber: 1 });
+    },
     filterBy(postType) {
       this.setProperties({ postType: postType, pageNumber: 1 });
       this.sendAction('filtersChanged', this.get('filters'));

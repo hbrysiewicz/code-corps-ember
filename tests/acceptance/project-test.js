@@ -139,6 +139,7 @@ test('Post filtering by type works', (assert) => {
 
   andThen(() => {
     assert.equal(find('.project-post-list .post-item').length, 4, 'only issues are rendered');
+    click('.filter.all');
   });
 });
 
@@ -228,5 +229,56 @@ test('Paging and filtering of posts combined works', (assert) => {
   andThen(() => {
     assert.equal(find('.post-item.issue').length, 2, 'second page of 2 issues is rendered');
     assert.equal(find('.post-item').length, 2, 'there are no other posts rendered');
+  });
+});
+
+test('Paging and filtering uses query parameters', (assert) => {
+  assert.expect(6);
+
+  let project = server.create('project');
+
+  let sluggedRoute = server.schema.sluggedRoute.create({ slug: 'test_organization' });
+  let organization = server.schema.organization.create({ slug: 'test_organization' });
+  sluggedRoute.owner = organization;
+  sluggedRoute.save();
+
+  project.organization = organization;
+  project.save();
+
+  server.createList('post', 22, { postType: 'task', projectId: project.id });
+  server.createList('post', 12, { postType: 'issue', projectId: project.id });
+
+  let expectedBaseURL = `/${sluggedRoute.slug}/${project.slug}/posts`;
+
+  visit(expectedBaseURL);
+
+  andThen(() => {
+    assert.equal(currentURL(), `${expectedBaseURL}`);
+    click('.pager-control .page-button.2');
+  });
+
+  andThen(() => {
+    assert.equal(currentURL(), `${expectedBaseURL}?page=2`, 'Page query param should update');
+    click('.filter.tasks');
+  });
+
+  andThen(() => {
+    assert.equal(currentURL(), `${expectedBaseURL}?type=task`, 'We switched type, so page param should reset as well');
+    click('.pager-control .page-button.3');
+  });
+
+  andThen(() => {
+    assert.equal(currentURL(), `${expectedBaseURL}?page=3&type=task`, 'We switched page again, so it should update, while keeping type');
+    click('.filter.all');
+  });
+
+  andThen(() => {
+    assert.equal(currentURL(), `${expectedBaseURL}`, 'We reset type to none, so it should be gone from the URL. Page should reset as well');
+  });
+
+  visit(`${expectedBaseURL}?page=3&type=task`);
+
+  andThen(() => {
+    assert.equal(find('.project-post-list .post-item').length, 2, 'Visiting URL via params directly, should fetch the correct posts');
   });
 });

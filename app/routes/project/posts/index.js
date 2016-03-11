@@ -1,11 +1,19 @@
 import Ember from 'ember';
 
 export default Ember.Route.extend({
+  queryParams: {
+    pageNumber: { as: 'page', refreshModel: true },
+    postType: { as: 'type', refreshModel: true }
+  },
+
   session: Ember.inject.service(),
 
-  model() {
+  model(params) {
     let project = this.modelFor('project');
-    return this.get('store').query('post', { projectId: project.get('id'), page: { number: 1 } });
+    let fullParams = Ember.merge(params, {
+      projectId: project.get('id')
+    });
+    return this.get('store').query('post', fullParams);
   },
 
   setupController(controller, model) {
@@ -13,13 +21,9 @@ export default Ember.Route.extend({
   },
 
   actions: {
-    reloadPosts(filters) {
-      let project = this.modelFor('project');
-      filters.projectId = project.get('id');
-
-      this.get('store').query('post', filters).then((posts) => {
-        this.controllerFor('project.posts.index').set('posts', posts);
-      });
+    updateQueryParams(filters) {
+      let controller = this.controllerFor('project.posts.index');
+      controller.setProperties(filters);
     },
   }
 });

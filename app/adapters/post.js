@@ -56,10 +56,28 @@ export default ApplicationAdapter.extend({
   sortQueryParams: function(query) {
     query = query || {};
 
+    // to preserve a clean url with just `&page=X` we only
+    // transform the page number to the proper JSON api format here, in the
+    // adapter, instead of back in the route
+    if (Ember.isPresent(query.pageNumber)) {
+      query.page = { number: query.pageNumber };
+      delete query.pageNumber;
+    }
+
+    // we don't want to send the postType parameter to the API if it does not
+    // have a proper value
+    if (Ember.isEmpty(query.postType)) {
+      delete query.postType;
+    }
+
+    // projectId is part of the url in `projects/:projectId/posts`, so we
+    // do not want to see it in the query as well
     if (query.projectId) {
       delete query.projectId;
     }
 
+    // any remaining fields are in camelCase, so we want to serialize them into
+    // underscore_format
     let serializedQuery = this._serializeQuery(query);
 
     return this._super(serializedQuery);
