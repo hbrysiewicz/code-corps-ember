@@ -211,6 +211,7 @@ test('Paging and filtering of posts combined works', (assert) => {
   });
 
   andThen(() => {
+    debugger;
     assert.equal(find('.post-item.task').length, 10, 'first page of 10 tasks is rendered');
     click('.pager-control .page-button.2');
   });

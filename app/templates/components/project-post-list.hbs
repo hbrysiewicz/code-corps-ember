@@ -3,22 +3,23 @@
     Filter by:
   </li>
   <li>
-    <a class="filter all" {{action 'removeFilter'}}>All</a>
+    {{!-- <a class="filter all" {{action 'removeFilter'}}>All</a> --}}
+    {{link-to "All" "project.posts" (query-params postType=null pageNumber=1) class="filter all"}}
   </li>
   <li>
-    <a class="filter tasks" {{action 'filterBy' 'task'}}>Tasks</a>
+    {{link-to "Tasks" "project.posts" (query-params postType='task' pageNumber=1) class="filter tasks"}}
   </li>
   <li>
-    <a class="filter issues" {{action 'filterBy' 'issue'}}>Issues</a>
+    {{link-to "Issues" "project.posts" (query-params postType='issue' pageNumber=1) class="filter issues"}}
   </li>
   <li>
-    <a class="filter progress" {{action 'filterBy' 'progress'}}>Progress</a>
+    {{link-to "Progress" "project.posts" (query-params postType='progress' pageNumber=1) class="filter progress"}}
   </li>
   <li>
-    <a class="filter ideas" {{action 'filterBy' 'idea'}}>Ideas</a>
+    {{link-to "Ideas" "project.posts" (query-params postType='idea' pageNumber=1) class="filter ideas"}}
   </li>
   <li>
-    {{#link-to 'project.posts.new' tagName='button' class="new-post success"}}New Post{{/link-to}}
+    {{link-to 'New Post' 'project.posts.new' tagName='button' class="new-post success"}}
   </li>
 </ul>
 <div class="posts">

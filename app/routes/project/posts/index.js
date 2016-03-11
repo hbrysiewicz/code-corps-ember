@@ -2,7 +2,7 @@ import Ember from 'ember';
 
 export default Ember.Route.extend({
   queryParams: {
-    pageNumber: { as: 'page', refreshModel: true },
+    pageNumber: { as: 'page', refreshModel: true, scope: 'controller' },
     postType: { as: 'type', refreshModel: true }
   },
 
