@@ -1,5 +1,5 @@
 ![Code Corps Ember Logo](docs/assets/code-corps-ember.png)
-
+asdf
 [![CircleCI](https://circleci.com/gh/code-corps/code-corps-ember.svg?style=shield)](https://circleci.com/gh/code-corps/code-corps-ember) [![devDependency Status](https://david-dm.org/code-corps/code-corps-ember/dev-status.svg)](https://david-dm.org/code-corps/code-corps-ember#info=devDependencies) [![Inline docs](http://inch-ci.org/github/code-corps/code-corps-ember.svg?branch=develop&style=shields)](http://inch-ci.org/github/code-corps/code-corps-ember) [![Coverage Status](https://coveralls.io/repos/github/code-corps/code-corps-ember/badge.svg)](https://coveralls.io/github/code-corps/code-corps-ember)
 [![Slack Status](http://slack.codecorps.org/badge.svg)](http://slack.codecorps.org)
 
